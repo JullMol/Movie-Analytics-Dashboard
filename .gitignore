@@ -1,0 +1,26 @@
+# ====== Python cache ======
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ====== Virtual environments ======
+venv/
+env/
+.venv/
+
+# ====== Model files (jangan upload ke GitHub) ======
+*.pkl
+*.joblib
+
+# ====== Data files (opsional, besar) ======
+*.csv
+*.xlsx
+*.zip
+*.h5
+
+# ====== Jupyter checkpoints ======
+.ipynb_checkpoints/
+
+# ====== System files ======
+.DS_Store
+Thumbs.db
