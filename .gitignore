@@ -9,9 +9,9 @@ env/
 .venv/
 
 # ====== Model files (jangan upload ke GitHub) ======
-*.pkl
 *.joblib
-
+lda_model.pkl
+tfidf_vectorizer.pkl
 # ====== Data files (opsional, besar) ======
 *.csv
 *.xlsx
