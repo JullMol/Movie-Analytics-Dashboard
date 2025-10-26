@@ -1,8 +1,3 @@
-# ===========================================
-# 🎬 MOVIE ANALYTICS DASHBOARD (FINAL VERSION)
-# ===========================================
-
-# ==== IMPORT LIBRARIES ====
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -19,13 +14,11 @@ from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.preprocessing import LabelEncoder
 from sklearn.exceptions import InconsistentVersionWarning
 
-# ==== SUPPRESS WARNINGS ====
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=ImportWarning)
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 
-# ==== PAGE CONFIG ====
 st.set_page_config(
     page_title="🎬 Movie Analytics Dashboard",
     layout="wide",
@@ -35,14 +28,12 @@ st.set_page_config(
 st.title("🎥 Movie Analytics Dashboard")
 st.markdown("Analisis dan prediksi data film menggunakan Machine Learning dan Topic Modeling (LDA).")
 
-# ==== UPLOAD DATASET ====
 uploaded_df = st.file_uploader("📤 Upload dataset hasil modeling (movie_model_results.csv)", type="csv")
 
 if uploaded_df:
     df = pd.read_csv(uploaded_df)
     st.success(f"✅ Dataset berhasil dimuat: {df.shape[0]} baris, {df.shape[1]} kolom")
 
-    # ==== TEXT MODEL: TF-IDF + LDA (DILATIH SEKALI) ====
     @st.cache_resource
     def load_text_models(df):
         import os
@@ -63,7 +54,6 @@ if uploaded_df:
 
     tfidf, lda = load_text_models(df)
 
-    # ==== SIDEBAR FILTER ====
     st.sidebar.header("🎛️ Filter Data")
     selected_genre = st.sidebar.multiselect("Pilih Genre", options=df['main_genre'].unique())
     selected_lang = st.sidebar.multiselect("Pilih Bahasa Asli", options=df['original_language'].unique())
@@ -79,7 +69,6 @@ if uploaded_df:
 
     st.sidebar.markdown(f"📊 Data terfilter: **{len(filtered_df)} film**")
 
-    # ==== TABS ====
     tab1, tab2, tab3, tab4 = st.tabs([
         "📊 Exploratory Data Analysis",
         "🧠 Classification Model",
@@ -87,9 +76,6 @@ if uploaded_df:
         "🎬 Film Predictor"
     ])
 
-    # ===========================================
-    # TAB 1 — EDA
-    # ===========================================
     with tab1:
         st.subheader("📈 Exploratory Data Analysis")
         col1, col2 = st.columns(2)
@@ -116,24 +102,20 @@ if uploaded_df:
 
             st.subheader("🧠 Visualisasi Topik Film (WordCloud LDA)")
 
-            # Ambil 10 kata teratas dari setiap topik berdasarkan komponen LDA
             words = tfidf.get_feature_names_out()
             n_topics = lda.components_.shape[0]
 
-            cols = st.columns(2)  # tampilkan 2 kolom per baris
+            cols = st.columns(2)  
             for i in range(n_topics):
                 topic_words = lda.components_[i]
                 word_freq = {words[j]: topic_words[j] for j in range(len(words))}
                 wc = WordCloud(width=600, height=400, background_color='white', colormap='plasma').generate_from_frequencies(word_freq)
 
-                col = cols[i % 2]  # untuk 2 kolom bergantian
+                col = cols[i % 2]  
                 with col:
                     st.markdown(f"**🎭 Topic {i+1}**")
                     st.image(wc.to_array(), use_container_width=True)
 
-    # ===========================================
-    # TAB 2 — CLASSIFICATION MODEL
-    # ===========================================
     with tab2:
         st.subheader("🧠 Evaluasi Model Klasifikasi Favorite Movie")
         if 'favorite_movie_pred' in df.columns:
@@ -150,9 +132,6 @@ if uploaded_df:
                 fig5 = px.bar(topic_fav, x='topic', y='favorite_movie_pred', title="Persentase Film Favorit per Topik (LDA)", color='favorite_movie_pred')
                 st.plotly_chart(fig5, use_container_width=True)
 
-    # ===========================================
-    # TAB 3 — REGRESSION MODEL
-    # ===========================================
     with tab3:
         st.subheader("💰 Model Prediksi Profit Film")
         if 'profit' in df.columns:
@@ -172,9 +151,6 @@ if uploaded_df:
                               title="Rata-Rata Profit Berdasarkan Tema Film (LDA)")
                 st.plotly_chart(fig8, use_container_width=True)
 
-    # ===========================================
-    # TAB 4 — FILM PREDICTOR
-    # ===========================================
     with tab4:
         st.subheader("🎬 Movie Success Predictor")
         st.markdown("Masukkan data film baru untuk memprediksi apakah film ini akan menjadi favorit dan seberapa besar profit-nya.")
@@ -196,20 +172,16 @@ if uploaded_df:
         if submit:
             st.info("🚀 Memulai prediksi...")
 
-            # Load model
             clf = joblib.load("favorite_movie_model.pkl")
             reg = joblib.load("profit_regressor.pkl")
 
-            # Gunakan model TF-IDF & LDA dari atas
             topic_vector = tfidf.transform([overview_input])
             topic_pred = int(np.argmax(lda.transform(topic_vector)))
 
-            # Encoding genre
             le_genre = LabelEncoder()
             le_genre.fit(df['main_genre'])
             genre_encoded = le_genre.transform([genre_input])[0]
 
-            # Buat dataframe input
             duration_hours = runtime_input / 60
             data = pd.DataFrame([{
                 'budget': budget_input,
@@ -223,11 +195,9 @@ if uploaded_df:
                 'topic': topic_pred
             }])
 
-            # Prediksi
             fav_pred = clf.predict(data)[0]
             profit_pred = reg.predict(data)[0]
 
-            # Hasil
             st.markdown("---")
             colA, colB = st.columns(2)
             with colA:
