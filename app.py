@@ -28,7 +28,7 @@ st.set_page_config(
 st.title("🎥 Movie Analytics Dashboard")
 st.markdown("Analisis dan prediksi data film menggunakan Machine Learning dan Topic Modeling (LDA).")
 
-uploaded_df = st.file_uploader("📤 Upload dataset hasil modeling (movie_model_results.csv)", type="csv")
+uploaded_df = st.file_uploader("📤 Upload dataset hasil modeling", type="csv")
 
 if uploaded_df:
     df = pd.read_csv(uploaded_df)
